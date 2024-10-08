@@ -1,4 +1,6 @@
-import { Chat, Store } from "./store/Store";
+import { Chat, Store, UserId } from "./store/Store";
+
+let globalChatId = 0;
 
 export interface Room {
     roomId: string;
@@ -28,11 +30,35 @@ export class InMemoryStore implements Store {
         return room.chats.reverse().slice(0, offset).slice(-1 * limit);
     }
 
-    addChats (room: string, limit: number, offset: number) {
+    addChats (userId: UserId, name: string, roomId: string, message: string) {
+        const room = this.store.get(roomId);
 
+        if (!room) {
+            return;
+        }
+
+        room.chats.push({
+            id: (globalChatId++).toString(),
+            userId,
+            name,
+            message,
+            upVotes: []
+
+
+        });
     }
 
-    upVote (room: string, chatId: string) {
+    upVote (userId: UserId, roomId: string, chatId: string) {
+        const room = this.store.get(roomId);
 
+        if (!room) {
+            return;
+        }
+
+        const chat = room.chats.find(({ id }) => id === chatId);
+
+        if (chat) {
+            chat.upVotes.push(userId);
+        }
     }
 }
