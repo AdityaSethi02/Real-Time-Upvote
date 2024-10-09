@@ -29,7 +29,6 @@ function originIsAllowed(origin: string) {
 }
 
 wsServer.on('request', function(request: any) {
-    console.log("inside connect");
 
     if (!originIsAllowed(request.origin)) {
         request.reject();
@@ -51,9 +50,6 @@ wsServer.on('request', function(request: any) {
             }
         }
     });
-    connection.on('close', function(reasonCode: number, description: string) {
-        console.log((new Date()) + ' Peer ' + connection.remoteAddress + ' disconnected.');
-    });
 });
 
 function messageHandler(ws: connection, message: IncomingMessage) {
@@ -66,19 +62,18 @@ function messageHandler(ws: connection, message: IncomingMessage) {
     if (message.type === SupportedMessage.SendMessage) {
         const payload = message.payload;
         const user = userManager.getUser(payload.roomId, payload.userId);
-        console.log("first");
+
         if (!user) {
             console.error("No user found")
             return;
         }
-        console.log("second");
+
         let chat = store.addChats(payload.userId, user.name, payload.roomId, payload.message);
 
         if (!chat) {
             console.error("No chat found")
             return;
         }
-        console.log("third");
 
         const outgoingPayload: OutgoingMessage = {
             type: OutgoingSupportedMessages.AddChat,

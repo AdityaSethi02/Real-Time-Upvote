@@ -5,29 +5,44 @@
     <script>
         const ws = new WebSocket('ws://localhost:8080', 'echo-protocol');
         ws.onopen = function () {
+            console.log("websocket is now open")
+            userId = Math.floor(Math.random() * 1000);
             ws.send(JSON.stringify({
                 type: "JOIN_ROOM",
                 payload: {
-                    userId: "1",
                     name: "aditya",
+                    userId: userId,
                     roomId: "2"
                 }
-            }))
-        }
+            }));
+        };
+
+        ws.onmessage = function (event) {
+            console.log("message received", event.data);
+            try {
+                const {payload, type} = JSON.parse(event.data);
+
+                if (type === "ADD_CHAT") {
+
+                }
+            } catch (error) {
+                console.error(error)
+            }
+        };
 
         function sendChat() {
             ws.send(JSON.stringify({
                 type: "SEND_MESSAGE",
                 payload: {
-                    message: "hi there",
-                    userId: "1",
+                    message: "new message",
+                    userId: userId,
                     roomId: "2"
                 }
-            }))
+            }));
         }
 
     </script>
-    hello world
+    hello world!!
     <br />
     <input type="text" id="inputText"></input>
     <br />
