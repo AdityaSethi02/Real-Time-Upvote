@@ -21,7 +21,7 @@ server.listen(8080, function() {
 
 const wsServer = new WebSocketServer({
     httpServer: server,
-    autoAcceptConnections: true
+    autoAcceptConnections: false
 });
 
 function originIsAllowed(origin: string) {
@@ -30,6 +30,7 @@ function originIsAllowed(origin: string) {
 
 wsServer.on('request', function(request: any) {
     console.log("inside connect");
+
     if (!originIsAllowed(request.origin)) {
         request.reject();
         console.log((new Date()) + ' Connection from origin ' + request.origin + ' rejected.');
@@ -43,7 +44,7 @@ wsServer.on('request', function(request: any) {
         // Todo: add rate limiting here
         if (message.type === 'utf8') {
             try {
-                console.log("message", message.utf8Data);
+                console.log("INDIE MSG: ", message.utf8Data);
                 messageHandler(connection, JSON.parse(message.utf8Data));
             } catch (error) {
 
@@ -55,28 +56,29 @@ wsServer.on('request', function(request: any) {
     });
 });
 
-function messageHandler(message: IncomingMessage, ws: connection) {
-    console.log("incoming message", JSON.stringify(message));
-
+function messageHandler(ws: connection, message: IncomingMessage) {
+    console.log("INCOMING MSG: ", JSON.stringify(message));
     if (message.type === SupportedMessage.JoinRoom) {
         const payload = message.payload;
-        userManager.addUser(payload.userId, payload.name, payload.roomId, ws);
+        userManager.addUser(payload.name, payload.userId, payload.roomId, ws);
     }
 
     if (message.type === SupportedMessage.SendMessage) {
         const payload = message.payload;
         const user = userManager.getUser(payload.roomId, payload.userId);
-
+        console.log("first");
         if (!user) {
             console.error("No user found")
             return;
         }
+        console.log("second");
         let chat = store.addChats(payload.userId, user.name, payload.roomId, payload.message);
 
         if (!chat) {
             console.error("No chat found")
             return;
         }
+        console.log("third");
 
         const outgoingPayload: OutgoingMessage = {
             type: OutgoingSupportedMessages.AddChat,
