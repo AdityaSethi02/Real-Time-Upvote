@@ -30,7 +30,7 @@ A real-time chat application built with **Node.js**, **WebSockets**, and **TypeS
   - TypeScript
 
 - **Frontend**: 
-  - Nextjs
+  - React
   - Tailwind CSS
 
 ## Installation & Setup
