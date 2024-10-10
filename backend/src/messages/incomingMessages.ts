@@ -37,6 +37,6 @@ export type UserMessageType = z.infer<typeof UserMessage>;
 export const UpVoteMessage = z.object({
     userId: z.string(),
     roomId: z.string(),
-    chatId: z.string()
+    chatId: z.string(),
 });
 export type UpVoteMessageType = z.infer<typeof UpVoteMessage>;
